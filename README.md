@@ -1,5 +1,8 @@
 # Leap of Legends — Mod SDK
 
+// add thumbnail.png for github
+[![Demo Mod Thumbnail](demo/thumbnail.png)]
+
 Create custom game modes for **Leap of Legends** using JSON configuration files.
 No coding, no compilation, no DLLs — just define your mode in `mod.json` and play.
 
