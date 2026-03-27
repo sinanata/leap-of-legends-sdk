@@ -1,0 +1,240 @@
+{
+  "id": "com.leapoflegends.demo",
+  "name": "Arena Showdown",
+  "version": "1.0.0",
+  "api_version": "1.0",
+  "author": "Leap of Legends",
+  "description": "Team deathmatch with effect zones! Official demo mod showcasing every framework feature. Faithful JSON translation of the C# ArenaShowdownMode.",
+  "thumbnail": "thumbnail.png",
+  "tags": ["official", "pvp", "teams", "tutorial"],
+  "steam_workshop_id": 0,
+
+  "players": {
+    "min": 1,
+    "max": 6
+  },
+
+  "ai": {
+    "enabled": true,
+    "count": 3,
+    "chase_range": 10.0,
+    "stomp_range": 5.0,
+    "bias_right": false
+  },
+
+  "teams": {
+    "enabled": true,
+    "count": 2,
+    "friendly_fire": false,
+    "auto_balance": true,
+    "definitions": [
+      { "id": 1, "name": "Red", "color": "#FF4C4C", "base_x": 3, "base_y": 6 },
+      { "id": 2, "name": "Blue", "color": "#4C80FF", "base_x": 26, "base_y": 6 }
+    ]
+  },
+
+  "map": {
+    "width": 30,
+    "height": 16,
+    "open_right": false,
+    "open_left": false,
+    "open_top": false,
+    "water_height": 2,
+    "regions": [
+      { "id": "red_base",       "min_x": 1,  "min_y": 3,  "max_x": 5,  "max_y": 8,  "cell_type": "air" },
+      { "id": "blue_base",      "min_x": 24, "min_y": 3,  "max_x": 28, "max_y": 8,  "cell_type": "air" },
+      { "id": "arena_center",   "min_x": 12, "min_y": 4,  "max_x": 17, "max_y": 10, "cell_type": "air" },
+      { "id": "arena_floor",    "min_x": 12, "min_y": 3,  "max_x": 17, "max_y": 3,  "cell_type": "rock" },
+      { "id": "corridor_left",  "min_x": 6,  "min_y": 5,  "max_x": 11, "max_y": 7,  "cell_type": "air" },
+      { "id": "corridor_right", "min_x": 18, "min_y": 5,  "max_x": 23, "max_y": 7,  "cell_type": "air" },
+      { "id": "ice_patch",      "min_x": 13, "min_y": 3,  "max_x": 16, "max_y": 3,  "cell_type": "ice" },
+      { "id": "lava_pit",       "min_x": 8,  "min_y": 1,  "max_x": 10, "max_y": 2,  "cell_type": "air" },
+      { "id": "acid_pool",      "min_x": 19, "min_y": 1,  "max_x": 21, "max_y": 2,  "cell_type": "air" }
+    ]
+  },
+
+  "timer": 240,
+
+  "win_conditions": [
+    { "type": "timer" },
+    { "type": "team_score", "target": 20 }
+  ],
+
+  "scoring": {
+    "type": "team_kills",
+    "label": "Kills",
+    "points_per_kill": 1,
+    "points_per_event": 1,
+    "streaks": {
+      "enabled": true,
+      "announce_at": 3
+    }
+  },
+
+  "spawn": {
+    "strategy": "team_base",
+    "respawn_delay": 2.0
+  },
+
+  "camera": {
+    "type": "fullmap",
+    "padding": 1.0
+  },
+
+  "hud": [
+    {
+      "type": "timer",
+      "anchor": "top_center",
+      "font_size": 32,
+      "flash_below": 30,
+      "flash_color": "#FF0000"
+    },
+    {
+      "type": "team_scores",
+      "anchor": "top_bar",
+      "font_size": 24,
+      "show_target": true,
+      "target": 20
+    },
+    {
+      "type": "streak_popup",
+      "min_streak": 3,
+      "duration": 2.0,
+      "color": "#FFD700",
+      "font_size": 18
+    },
+    {
+      "type": "player_count",
+      "anchor": "bottom_left",
+      "font_size": 14
+    },
+    {
+      "type": "message",
+      "anchor": "bottom_center",
+      "text": "First to 20 kills wins early!",
+      "font_size": 14,
+      "color": "#CCCCCC"
+    },
+    {
+      "type": "kill_feed",
+      "anchor": "top_right",
+      "font_size": 14,
+      "feed_entries": 5,
+      "feed_duration": 4.0
+    },
+    {
+      "type": "custom_counter",
+      "anchor": "top_left",
+      "counter_key": "total_kills",
+      "format": "Match Kills: {value}",
+      "font_size": 16,
+      "color": "#AAAAAA",
+      "offset_y": 50
+    },
+    {
+      "type": "progress_bar",
+      "anchor": "bottom_center",
+      "progress_key": "zone_progress",
+      "bar_width": 220,
+      "bar_height": 16,
+      "fill_color": "#FFCC00",
+      "bg_color": "#222222",
+      "label": "Hill: {value}",
+      "offset_y": -35
+    }
+  ],
+
+  "post_match": {
+    "title": "Team {winning_team_name} Wins!|Draw!",
+    "show_mvp": true,
+    "show_team_result": true
+  },
+
+  "effects": [
+    {
+      "type_id": 64,
+      "name": "Team Rally",
+      "behavior": "buff",
+      "color": "#FFCC00",
+      "apply_as": "speed_boost",
+      "magnitude": 1.5,
+      "duration": 6.0
+    },
+    {
+      "type_id": 65,
+      "name": "Arena Fatigue",
+      "behavior": "debuff",
+      "color": "#8000FF",
+      "apply_as": "speed_slow",
+      "magnitude": 0.6,
+      "duration": 4.0
+    }
+  ],
+
+  "mechanics": [
+    {
+      "type": "effect_zone",
+      "positions": [3, 6, 26, 6],
+      "effect_id": 64,
+      "effect_duration": 6.0,
+      "effect_magnitude": 1.5,
+      "zone_radius": 2.0,
+      "persistent": false,
+      "one_shot": false
+    },
+    {
+      "type": "zone_control",
+      "zone_id": "arena_center",
+      "capture_time": 10.0,
+      "points_per_capture": 3,
+      "reset_on_contest": true,
+      "progress_key_prefix": "zone_progress"
+    },
+    {
+      "type": "hazard_zone",
+      "hazard_zones": ["lava_pit", "acid_pool"],
+      "hazard_type": "periodic_damage",
+      "hazard_magnitude": 2.0
+    },
+    {
+      "type": "portal",
+      "portal_pairs": [2, 8, 27, 8],
+      "portal_radius": 1.0,
+      "portal_cooldown": 3.0
+    }
+  ],
+
+  "mod_state": [
+    { "key": "red_kills", "type": "int", "default_value": 0 },
+    { "key": "blue_kills", "type": "int", "default_value": 0 },
+    { "key": "best_streak", "type": "int", "default_value": 0 },
+    { "key": "overtime", "type": "bool", "default_value": 0 },
+    { "key": "total_kills", "type": "int", "default_value": 0 }
+  ],
+
+  "triggers": [
+    {
+      "event_name": "on_match_start",
+      "actions": [
+        { "action": "set_mod_int", "key": "red_kills", "int_value": 0 },
+        { "action": "set_mod_int", "key": "blue_kills", "int_value": 0 },
+        { "action": "set_mod_int", "key": "best_streak", "int_value": 0 },
+        { "action": "set_mod_int", "key": "total_kills", "int_value": 0 },
+        { "action": "set_mod_bool", "key": "overtime", "bool_value": false },
+        { "action": "broadcast_event", "event_broadcast": "match_started" }
+      ]
+    },
+    {
+      "event_name": "on_kill",
+      "actions": [
+        { "action": "add_mod_int", "key": "total_kills", "int_value": 1 }
+      ]
+    },
+    {
+      "event_name": "on_match_end",
+      "actions": [
+        { "action": "broadcast_event", "event_broadcast": "match_complete" }
+      ]
+    }
+  ]
+}
