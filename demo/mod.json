@@ -1,7 +1,7 @@
 {
   "id": "com.leapoflegends.demo",
   "name": "Arena Showdown",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "api_version": "1.0",
   "author": "Leap of Legends",
   "description": "Team deathmatch with effect zones! Official demo mod showcasing every framework feature.",
