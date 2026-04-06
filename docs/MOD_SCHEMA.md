@@ -21,6 +21,57 @@ Every field, every option, every default. Copy what you need into your `mod.json
 | `tags` | string[] | `[]` | Searchable tags |
 | `steam_workshop_id` | int | `0` | Set automatically after first Workshop upload |
 
+## Localization
+
+Localize your mod's name and description for all 30 Steam-supported languages using flat keys
+with **Steam API language code** suffixes. This format aligns directly with Steam Workshop
+metadata so the same keys serve both in-game display and the Workshop store page.
+
+The top-level `name` and `description` fields serve as the default (English) fallback.
+
+```json
+"name": "My Mod",
+"description": "English description (default)",
+
+"name_french":       "Mon Mod",
+"name_german":       "Mein Mod",
+"name_japanese":     "マイモッド",
+"name_koreana":      "나의 모드",
+
+"description_french":   "Description en français",
+"description_german":   "Beschreibung auf Deutsch",
+"description_japanese": "日本語の説明",
+"description_koreana":  "한국어 설명"
+```
+
+### Steam API Language Codes
+
+Use these exact codes as suffixes for `name_` and `description_` keys:
+
+| Code | Language | Code | Language |
+|------|----------|------|----------|
+| `arabic` | Arabic | `koreana` | Korean |
+| `bulgarian` | Bulgarian | `norwegian` | Norwegian |
+| `schinese` | Chinese (Simplified) | `polish` | Polish |
+| `tchinese` | Chinese (Traditional) | `portuguese` | Portuguese |
+| `czech` | Czech | `brazilian` | Portuguese-Brazil |
+| `danish` | Danish | `romanian` | Romanian |
+| `dutch` | Dutch | `russian` | Russian |
+| `english` | English | `spanish` | Spanish-Spain |
+| `finnish` | Finnish | `latam` | Spanish-Latin America |
+| `french` | French | `swedish` | Swedish |
+| `german` | German | `thai` | Thai |
+| `greek` | Greek | `turkish` | Turkish |
+| `hungarian` | Hungarian | `ukrainian` | Ukrainian |
+| `indonesian` | Indonesian | `vietnamese` | Vietnamese |
+| `italian` | Italian | `japanese` | Japanese |
+
+> **Note:** You don't need to provide all 30 languages. Only include the ones you can provide
+> quality translations for. The game falls back to the default `name`/`description` for any
+> missing language.
+
+See `demo/mod.json` for a complete example with all 30 languages translated.
+
 ## Players
 
 ```json

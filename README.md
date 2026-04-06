@@ -45,6 +45,7 @@ The `demo/` folder contains a **complete example** demonstrating every feature:
 | HUD: timer, scores, streaks | `hud` widget array |
 | Custom effects | `effects` array |
 | AI tuning | `ai` config |
+| **30-language localization** | `name_french`, `description_german`, etc. |
 
 ## Quick Reference
 
@@ -60,6 +61,11 @@ The `demo/` folder contains a **complete example** demonstrating every feature:
   "description": "Short description",
   "thumbnail": "thumbnail.png",
   "tags": ["pvp", "teams"],
+
+  "name_french": "Nom Français",
+  "name_german": "Deutscher Name",
+  "description_french": "Description en français",
+  "description_german": "Beschreibung auf Deutsch",
 
   "players": { "min": 1, "max": 6 },
 
@@ -169,6 +175,19 @@ The `demo/` folder contains a **complete example** demonstrating every feature:
 `top_left`, `top_center`, `top_right`, `center`, `bottom_left`, `bottom_center`, `bottom_right`, `top_bar`
 
 All widgets support `offset_x`, `offset_y` for fine-tuning.
+
+### Localization (Steam API Language Codes)
+
+Localize your mod name and description using Steam's API language codes as key suffixes:
+
+```json
+"name_french": "Translated Name",
+"description_french": "Translated Description"
+```
+
+All 30 Steam language codes: `arabic`, `bulgarian`, `schinese`, `tchinese`, `czech`, `danish`, `dutch`, `english`, `finnish`, `french`, `german`, `greek`, `hungarian`, `indonesian`, `italian`, `japanese`, `koreana`, `norwegian`, `polish`, `portuguese`, `brazilian`, `romanian`, `russian`, `spanish`, `latam`, `swedish`, `thai`, `turkish`, `ukrainian`, `vietnamese`
+
+See [docs/MOD_SCHEMA.md](docs/MOD_SCHEMA.md#localization) for the full mapping table.
 
 ### Map Region Cell Types
 

@@ -32,6 +32,7 @@ Before uploading, verify:
 - `tags` are relevant (e.g., `"pvp"`, `"teams"`, `"casual"`)
 - `steam_workshop_id` is `0` for first upload (updated automatically after)
 - JSON is valid (no trailing commas, proper quoting)
+- **Localization** (optional but recommended): add `name_french`, `description_german`, etc. for international reach. Uses Steam API language codes — see [MOD_SCHEMA.md](MOD_SCHEMA.md#localization) for the full list
 
 ## Step 2: Local Testing
 

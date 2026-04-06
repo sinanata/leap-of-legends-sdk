@@ -15,6 +15,7 @@ A complete example mod demonstrating every feature of the JSON mod system.
 | 5 HUD widgets | `hud` array (timer, team scores, streak, count, message) |
 | Custom effects | `effects` array (Team Rally, Arena Fatigue) |
 | AI tuning | `ai` config (chase/stomp ranges) |
+| 30-language localization | `name_french`, `description_koreana`, etc. (Steam API codes) |
 
 ## How to Use
 
