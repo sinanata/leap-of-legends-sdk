@@ -201,7 +201,7 @@ These activate built-in systems via the `mechanics` array:
 |------|-------------|------------|
 | `collectible` | Spawned items (coins, gems) | `resource`, `values`, `initial_count`, `scatter_on_death` |
 | `flag` | Capture the flag | `auto_return_time`, `pickup_radius` |
-| `zone_button` | Area-effect button (Crossroads-style) | `safe_zone`, `cooldown`, `kill_outside` |
+| `zone_button` | Area-effect button (Crossfire-style) | `safe_zone`, `cooldown`, `kill_outside` |
 
 ### Effect Types (built-in)
 

@@ -599,7 +599,7 @@ Team-based flag capture. Requires `teams.enabled = true`.
 
 Flag positions come from `teams.definitions[].base_x/base_y`.
 
-### Zone Button (Crossroads-style)
+### Zone Button (Crossfire-style)
 
 A button that kills all players outside a safe zone.
 
