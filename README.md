@@ -8,11 +8,25 @@ No coding, no compilation, no DLLs — just define your mode in `mod.json` and p
 ## Getting Started
 
 1. **Create a folder** for your mod (e.g., `com.yourname.yourmod/`)
-2. **Create `mod.json`** with your game mode configuration (see schema below)
-3. **Add a thumbnail** (`thumbnail.png`, 512x512 recommended)
+2. **Create `mod.json`** with your game mode configuration (see schema below).
+   Add `"$schema": "./mod.schema.json"` (copy [mod.schema.json](mod.schema.json)
+   next to it) for editor autocomplete + validation in VS Code and friends.
+3. **Add a thumbnail** (`thumbnail.png`, 512x512 recommended) — it shows on
+   your mod's card in the mode selection screen
 4. **Copy to game**: place folder in `<Game>/LeapOfLegends_Data/StreamingAssets/Mods/`
-5. **Launch the game** — your mod appears in the mode selection screen
-6. **Upload**: use the in-game Steam Workshop UI
+   (the **Open Mods Folder** button on the mode selection screen takes you there)
+5. **Launch the game** — your mod appears in the mode selection screen.
+   While iterating, press **Reload Mods** there instead of restarting.
+   A broken mod shows up as a red card with the exact error (line/column for
+   JSON syntax); a mod with suspicious config shows a warnings badge.
+6. **Draw your map** (optional) — Mods screen → **Map Editor** paints a
+   fixed `map.layout` straight into your mod.json (or scaffolds a whole new
+   mod with **New Mod**). Random generation stays the default if you skip it.
+7. **Add flair** (optional) — drop `background.png` and `music.ogg` next to
+   mod.json for a custom backdrop + soundtrack, and a `voice/` folder to
+   replace announcer nudges. See the schema reference for details.
+8. **Upload**: use the in-game Steam Workshop UI — the whole folder
+   (json, images, audio) ships with your Workshop item
 
 That's it. No build tools, no dependencies, no version conflicts.
 
@@ -22,11 +36,15 @@ That's it. No build tools, no dependencies, no version conflicts.
 leap-of-legends-sdk/
 ├── demo/                    ← Complete example mod (Arena Showdown)
 │   ├── mod.json             ← Full mod configuration
+│   ├── background.png       ← Custom match background (api 1.1)
 │   └── README.md            ← Demo-specific docs
+├── examples/
+│   └── fixed-arena/         ← Hand-authored map.layout example (api 1.1)
 ├── docs/                    ← Detailed documentation
 │   ├── MOD_SCHEMA.md        ← Complete JSON schema reference
 │   ├── SECURITY.md          ← Security model
 │   └── WORKSHOP_UPLOAD.md   ← Steam Workshop guide
+├── mod.schema.json          ← JSON Schema for editor autocomplete
 └── README.md                ← This file
 ```
 
@@ -37,15 +55,17 @@ The `demo/` folder contains a **complete example** demonstrating every feature:
 | Feature | How It's Configured |
 |---------|-------------------|
 | Teams (Red vs Blue) | `teams.enabled`, `teams.definitions` |
-| Custom map with regions | `map.regions` (bases, arena, ice patch) |
+| Hand-built map | `map.layout` text rows (api 1.1) — bases, hill, pits, ledges |
+| Named regions for mechanics | `map.regions` (hill rect, hazard pits) |
 | Timer + score-target win | `win_conditions` array |
 | Team kill scoring + streaks | `scoring.type`, `scoring.streaks` |
-| Team-based spawning | `spawn.strategy: "team_zones"` |
-| Full-map camera | `camera.type: "fullmap"` |
-| HUD: timer, scores, streaks | `hud` widget array |
-| Custom effects | `effects` array |
+| Team-base spawning | `spawn.strategy: "team_base"` |
+| HUD: timer, scores, team leaderboard, capture bar | `hud` widget array |
+| Custom effects (zone buff + on-kill debuff) | `effects` array + `apply_effect` trigger |
+| Effect zones, hazards, portals, king-of-the-hill | `mechanics` array |
 | AI tuning | `ai` config |
 | **30-language localization** | `name_french`, `description_german`, etc. |
+| Custom background image | `background` block + `background.png` (api 1.1) |
 
 ## Quick Reference
 
@@ -109,7 +129,7 @@ The `demo/` folder contains a **complete example** demonstrating every feature:
   },
 
   "spawn": { "strategy": "maximin" },
-  "camera": { "type": "fullmap" },
+  "movement": { "jump": 1.2, "gravity": 0.9 },
 
   "hud": [
     { "type": "timer", "anchor": "top_center", "font_size": 36, "flash_below": 30 },
@@ -127,8 +147,13 @@ The `demo/` folder contains a **complete example** demonstrating every feature:
 | `timer` | Ends when timer expires | (uses top-level `timer` value) |
 | `score` | Any player reaches target | `target` |
 | `team_score` | Any team reaches target | `target` |
-| `all_dead` | All human players dead | — |
+| `all_dead` | All players dead | — |
+| `all_humans_dead` | All human players dead (AI ignored) | — |
 | `captures` | Team capture count | `target` |
+| `zone_hold` | Team holds the zone long enough | `hold_time` |
+| `checkpoint_race` | Checkpoint / lap target reached | `target` |
+| `state` | Custom: a mod state comparison holds | `key`, `op`, `value` |
+| `last_standing` | One player left alive | — |
 
 ### Scoring Types
 
@@ -150,13 +175,17 @@ The `demo/` folder contains a **complete example** demonstrating every feature:
 | `team_base` | Spawn at team's base position |
 | `behind_leader` | Spawn behind furthest player (scrolling modes) |
 
-### Camera Types
+### Camera
 
-| Type | Description |
-|------|-------------|
-| `fullmap` | Orthographic view of entire map (default) |
-| `follow` | Follows the local player |
-| `scrolling` | Auto-scrolling camera |
+Every 2D mode uses the game's single tuned **follow** camera (with built-in
+zoom). `camera.type` accepts `fullmap`/`scrolling` as legacy aliases that run
+as follow. You can skip the `camera` section entirely.
+
+### Movement (api 1.1)
+
+`"movement": { "move_speed": 1.0, "jump": 1.0, "gravity": 1.0 }` — mod-wide
+multipliers for every player, clamped to 0.25-4.0. Low gravity arenas, speed
+modes, bunny-hop modes: one line each.
 
 ### HUD Widget Types
 
@@ -169,12 +198,23 @@ The `demo/` folder contains a **complete example** demonstrating every feature:
 | `player_count` | Alive/total display | — |
 | `message` | Custom text | `text` (supports `{target}`, `{time_remaining}`) |
 | `resource` | Resource counter | `resource`, `label` |
+| `progress_bar` | Fillable bar from mod state | `progress_key`, `fill_color` |
+| `kill_feed` | Recent kills ticker | `feed_entries`, `feed_duration` |
+| `custom_counter` | Formatted mod state value | `counter_key`, `format` |
+| `flag_status` | Per-team flag state | (teams required) |
+| `button_cooldown` | Zone button readiness | — |
+| `announcement` | Fading text from `announce` trigger actions (api 1.1) | `font_size`, `color` |
 
 ### HUD Anchor Positions
 
 `top_left`, `top_center`, `top_right`, `center`, `bottom_left`, `bottom_center`, `bottom_right`, `top_bar`
 
-All widgets support `offset_x`, `offset_y` for fine-tuning.
+Widgets sharing an anchor stack automatically into a column (declaration
+order = top to bottom) — they never overlap. All widgets support
+`offset_x`, `offset_y` for fine-tuning on top of the stacking.
+
+In team modes the `leaderboard` widget groups players under colored team
+headers with live team scores (`max_entries` then applies per team).
 
 ### Localization (Steam API Language Codes)
 
@@ -191,17 +231,54 @@ See [docs/MOD_SCHEMA.md](docs/MOD_SCHEMA.md#localization) for the full mapping t
 
 ### Map Region Cell Types
 
-`air`, `rock`, `water`, `ice`
+`air`, `rock`, `water`, `ice`, `sand`, `dirt`, `gravel`, `grass` (solid types
+become solid ground re-themed by position — see MOD_SCHEMA.md)
+
+### Custom Map Layouts (api 1.1)
+
+`map.layout` draws the whole map as text rows (top row first), replacing
+random generation. Paint it in-game with the **Map Editor** (Mods screen)
+or by hand:
+
+```json
+"map": {
+  "layout": [
+    "############",
+    "#..........#",
+    "#..GG..II..#",
+    "############"
+  ]
+}
+```
+
+| Char | Cell | | Char | Cell |
+|------|------|-|------|------|
+| `.` | air | | `S` | sand |
+| `#` | rock | | `D` | dirt |
+| `~` | water | | `V` | gravel |
+| `I` | ice | | `G` | grass |
+
+Rules: 8-64 columns × 6-32 rows, all rows equal length, borders must be
+solid (the engine seals non-solid edges to rock). `map.regions` still work
+as named rectangles for mechanics (`zone_control`, `hazard_zone`, spawn
+zones) — with a layout they no longer carve cells. See `demo/` and
+`examples/fixed-arena/`.
 
 ### Built-in Game Mechanics
 
-These activate built-in systems via the `mechanics` array:
+These activate built-in systems via the `mechanics` array (one entry per
+type; all 8 available to JSON mods since game 0.1.106):
 
 | Type | Description | Key Fields |
 |------|-------------|------------|
 | `collectible` | Spawned items (coins, gems) | `resource`, `values`, `initial_count`, `scatter_on_death` |
-| `flag` | Capture the flag | `auto_return_time`, `pickup_radius` |
+| `flag` | Capture the flag (teams required) | `auto_return_time`, `flag_pickup_radius`, `capture_radius` |
 | `zone_button` | Area-effect button (Crossfire-style) | `safe_zone`, `cooldown`, `kill_outside` |
+| `effect_zone` | Buff/debuff pickup areas | `positions`, `effect_id`, `zone_radius` |
+| `zone_control` | King-of-the-hill capture point | `zone_id`, `capture_time` |
+| `portal` | Teleporter pairs | `portal_pairs`, `portal_cooldown` |
+| `hazard_zone` | Damage/kill regions | `hazard_zones`, `hazard_type` |
+| `checkpoint` | Race checkpoints + laps | `checkpoint_positions`, `ordered`, `laps` |
 
 ### Effect Types (built-in)
 
@@ -216,6 +293,46 @@ These activate built-in systems via the `mechanics` array:
 | 7 (0x07) | Teleport |
 | 8 (0x08) | Gravity |
 | 64-255 | Custom mod effects |
+
+Every active effect is visible in the world: zones render as color-coded
+volumes (ring pads, striped hazard boxes, the framed capture hill, portal
+gates) and affected characters carry a matching aura + rim/tint — in both
+the 3D and the low-end sprite render paths.
+
+Buffs and debuffs never stack (applying one polarity purges the other;
+`behavior` decides which side an effect is on), and death clears all
+effects — respawns always start clean.
+
+### Audio Overrides — All Replaceable Sound Names (api 1.1)
+
+Drop `music.ogg` next to mod.json for custom match music (`music_1.ogg`,
+`music_2.ogg`, … form a shuffled playlist). Put voice/SFX replacements in a
+`voice/` folder, named after these built-in clip keys (`.ogg` recommended;
+`.wav`/`.mp3` also work). Add `_1`, `_2`, … suffixed variants of any key to
+have one picked at random per play. Keys you don't provide keep the stock
+sound; child accounts always keep the curated stock audio.
+
+| Key | Plays when |
+|-----|------------|
+| `Voice_Yeah` | Your kill (random pick from the single-kill pool) |
+| `Voice_Smasher` | Your kill (single-kill pool) |
+| `Voice_OhYeah` | Your kill (single-kill pool) |
+| `Voice_Ninja` | Your kill (single-kill pool) |
+| `Voice_Hmm` | Your kill (single-kill pool) |
+| `Voice_Crusher` | Your kill (single-kill pool) |
+| `Voice_FirstBlood` | First kill of the match (heard by everyone) |
+| `Voice_DoubleKill` | 2 kills in quick succession (killer only) |
+| `Voice_TripleKill` | 3 kills in quick succession (killer only) |
+| `Voice_QuadKill` | 4 kills in quick succession (killer only) |
+| `Voice_LikeABoss` | Kill-streak tier 1 (killer only) |
+| `Voice_Legendary` | Kill-streak tier 2 (killer only) |
+| `Voice_Dominating` | Kill-streak tier 3 (killer only) |
+| `Crush` | Kill impact SFX at the kill position (gore on) |
+| `Poof` | Kill impact SFX at the kill position (gore off / child-safe) |
+
+Optional `audio` block: `music` (filename), `music_volume` (0.05-1.0 extra
+scale), `voice_dir` (folder name, default `"voice"`). See
+[docs/MOD_SCHEMA.md](docs/MOD_SCHEMA.md#audio--voice-overrides-api-11).
 
 ## Example Modes
 
@@ -282,8 +399,10 @@ These activate built-in systems via the `mechanics` array:
 - Start by copying the `demo/mod.json` and modifying values
 - Only include fields you want to change — sensible defaults apply for everything else
 - Test with AI bots before multiplayer
-- Map regions override WFC generation — use them for bases, arenas, corridors
-- HUD widgets stack — use `offset_y` to prevent overlap
+- Prefer `map.layout` for designed maps; regions carve WFC maps and name
+  rectangles for mechanics
+- HUD widgets on the same anchor stack automatically; use `offset_y` only
+  for extra fine-tuning
 - AI bots have negative NetworkIds
 - Map grid is indexed as `y * Width + x`
 - Keep thumbnails at 512x512 PNG for best Workshop display

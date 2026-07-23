@@ -1,0 +1,97 @@
+{
+  "id": "com.example.fixedarena",
+  "name": "Fixed Arena",
+  "version": "1.0.0",
+  "api_version": "1.1",
+  "author": "Leap of Legends",
+  "description": "Example: a fully hand-authored map via map.layout — no random generation. Slippery ice, launch pads, and a slow-zone hazard, all placed exactly where the layout says.",
+  "tags": ["example", "pvp"],
+
+  "players": { "min": 1, "max": 6 },
+
+  "ai": { "enabled": true, "count": 3 },
+
+  "map": {
+    "layout": [
+      "############################",
+      "#..........................#",
+      "#..........................#",
+      "#....####..........####....#",
+      "#..........................#",
+      "#..........GGGGGG..........#",
+      "#..........######..........#",
+      "#..........................#",
+      "#....GG..............GG....#",
+      "#..........................#",
+      "#III....................III#",
+      "#..........................#",
+      "#~~~~....##########....~~~~#",
+      "############################"
+    ],
+    "jumpers_enabled": false,
+    "regions": [
+      { "id": "ice_left",  "min_x": 1,  "min_y": 4, "max_x": 3,  "max_y": 5 },
+      { "id": "ice_right", "min_x": 24, "min_y": 4, "max_x": 26, "max_y": 5 }
+    ]
+  },
+
+  "timer": 240,
+
+  "win_conditions": [
+    { "type": "timer" },
+    { "type": "score", "target": 10 }
+  ],
+
+  "scoring": {
+    "type": "kills",
+    "label": "Kills",
+    "streaks": { "enabled": true, "announce_at": 3 }
+  },
+
+  "movement": { "jump": 1.1 },
+
+  "effects": [
+    {
+      "type_id": 64,
+      "name": "Launch Pad",
+      "behavior": "buff",
+      "color": "#00FF88",
+      "apply_as": "jump_boost",
+      "magnitude": 1.6,
+      "duration": 4.0
+    }
+  ],
+
+  "mechanics": [
+    {
+      "type": "effect_zone",
+      "positions": [5.5, 6.2, 21.5, 6.2],
+      "effect_id": 64,
+      "effect_duration": 4.0,
+      "effect_magnitude": 1.6,
+      "zone_radius": 1.2,
+      "persistent": false
+    },
+    {
+      "type": "hazard_zone",
+      "hazard_zones": ["ice_left", "ice_right"],
+      "hazard_type": "slow",
+      "hazard_magnitude": 0.55
+    }
+  ],
+
+  "hud": [
+    { "type": "timer", "anchor": "top_center", "font_size": 32 },
+    { "type": "leaderboard", "anchor": "top_right", "max_entries": 6 },
+    { "type": "announcement", "anchor": "top_center", "font_size": 26, "color": "#7DF9AA", "offset_y": 90 }
+  ],
+
+  "triggers": [
+    {
+      "event_name": "on_match_start",
+      "actions": [
+        { "action": "announce", "text": "Hand-built arena — the green pads launch you!", "duration": 4.0 }
+      ]
+    }
+  ]
+}
